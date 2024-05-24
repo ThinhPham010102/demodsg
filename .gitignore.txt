@@ -1,0 +1,44 @@
+# Bỏ qua thư mục node_modules
+node_modules/
+
+# Bỏ qua các tệp log
+npm-debug.log
+yarn-error.log
+lerna-debug.log
+.pnpm-debug.log*
+
+# Bỏ qua các tệp cấu hình môi trường
+.env
+.env.local
+.env.*.local
+
+# Bỏ qua tệp hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Bỏ qua tệp lockfile
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Bỏ qua thư mục build và tạm thời
+dist/
+build/
+tmp/
+temp/
+
+# Bỏ qua tệp biên dịch TypeScript
+*.tsbuildinfo
+
+# Bỏ qua thư mục cấu hình IDEs và editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Bỏ qua thư mục tạm thời
+tmp/
+temp/
