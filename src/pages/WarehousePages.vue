@@ -25,31 +25,7 @@
 </template>
 
 <script>
-import { date } from "quasar";
 export default {
-  components: {
-    BriefCaseProcess: () => import("components/BriefCase/BriefCaseProcess"),
-    BriefCaseTable: () => import("components/BriefCase/BriefCaseTable"),
-  },
-  props: {
-    value: {},
-    viewEdit: {
-      default: true,
-      type: Boolean,
-    },
-    viewApprove: {
-      default: true,
-      type: Boolean,
-    },
-    viewSendApprove: {
-      default: true,
-      type: Boolean,
-    },
-    viewReject: {
-      default: true,
-      type: Boolean,
-    },
-  },
   data() {
     return {
       titleTable: "Danh sách hồ sơ",
@@ -214,6 +190,7 @@ export default {
       debugger;
       if (val == "catalog_list") this.titleTable = "Danh sách hồ sơ";
       else if (val == "catalog_approve") {
+        
         this.titleTable = "Danh sách hồ sơ cần duyệt";
       }
     },

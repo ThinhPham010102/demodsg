@@ -25,9 +25,6 @@
 </template>
 
 <script>
-import { date } from "quasar";
-import { ref, reactive, onMounted, watch } from "vue";
-
 export default {
   components: {
     BriefCaseProcess: () => import("components/BriefCase/BriefCaseProcess"),
@@ -99,52 +96,9 @@ export default {
         processType.value = "catalog_approve";
         briefCaseDatas.briefCaseDatas = briefCaseDatas.briefCaseApproveDatas;
       }
-    };
+      this.editModal = false;
+    }
+  }
+}
 
-    const formattedDate = (dateString) => {
-      try {
-        return date.formatDate(dateString, "DD/MM/YYYY");
-      } catch {
-        return "";
-      }
-    };
-
-    const infoData = (data) => {
-      showBriefCaseInfo.value = true;
-      showTable.value = false;
-      briefCaseInfo.value = data;
-    };
-
-    const infoBriefCaseBackClick = () => {
-      showBriefCaseInfo.value = false;
-      showTable.value = true;
-      briefCaseInfo.value = null;
-    };
-
-    const submitClick = (data) => {
-      // Call API submit
-      data.Status = {
-        Name: "Chờ duyệt",
-        Color: "green",
-      };
-      // Update table
-      refs.BriefCaseTable.UpdateStatus(data);
-      showTable.value = true;
-      showBriefCaseInfo.value = false;
-    };
-
-    return {
-      showTable,
-      showBriefCaseInfo,
-      briefCaseInfo,
-      briefCaseDatas,
-      titleTable,
-      processType,
-      formattedDate,
-      infoData,
-      infoBriefCaseBackClick,
-      submitClick,
-    };
-  },
-};
 </script>

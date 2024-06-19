@@ -13,15 +13,33 @@ const routes = [
   },
 
   {
-    path: "/Catalog/:type",
-    component: () => import("src/pages/CatalogPages.vue"),
+    path: "/CatalogPages/list",
+    component: () => import("pages/CatalogPages.vue"),
     meta: {
       requiresAuth: true,
     },
   },
   {
-    path: "/Warehouse",
-    component: () => import("pages/Warehouse.vue"),
+    path: "/WarehouseSort",
+    component: () => import("pages/WarehouseSort.vue"),
+    name: "Warehouse.Sort",
+    meta: {
+      breadcrumb: [
+        {
+          text: "Kho lưu trữ",
+          to: { name: "Warehouse.Sort" },
+        },
+        {
+          text: "Sắp xếp hồ sơ",
+          to: { name: "Warehouse.Sort" },
+        },
+      ],
+    },
+  },
+
+  {
+    path: "/WarehousePages",
+    component: () => import("pages/WarehousePages.vue"),
     name: "Warehouse.search",
     meta: {
       auth: true,

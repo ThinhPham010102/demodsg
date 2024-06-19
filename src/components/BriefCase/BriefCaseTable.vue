@@ -171,7 +171,7 @@ export default {
   },
   name: "BriefCaseTable",
   components: {
-    BriefCaseAdd: () => import("components/BriefCase/BriefCaseAdd"),
+    BriefCaseAdd: () => import("components/BriefCase/BriefCaseAdd.vue"),
   },
   setup(props, { emit }) {
     const filter = ref("");

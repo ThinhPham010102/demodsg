@@ -9,6 +9,7 @@
         <q-card-section>
           <q-list class="row">
             <q-item class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
+              <!-- Phông -->
               <q-item-section>
                 <q-select
                   v-model="briefCase_form.Organization"
@@ -25,7 +26,10 @@
             </q-item>
             <!-- More q-item components here -->
           </q-list>
-        </q-card-section>
+
+       </q-card-section>
+          <!-- Lưu & Hủy-->
+
         <q-card-actions vertical align="center">
           <div class="row">
             <q-btn
