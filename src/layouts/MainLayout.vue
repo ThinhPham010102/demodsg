@@ -1,7 +1,9 @@
 <template>
   <q-layout view="hHh Lpr lff">
     <q-header elevated>
+
       <q-toolbar>
+
         <q-btn flat dense round @click="leftDrawerOpen = !leftDrawerOpen" icon="menu" aria-label="Menu" />
         <q-toolbar-title> SOHO DMS </q-toolbar-title>
 
@@ -12,9 +14,10 @@
         </q-breadcrumbs>
         <q-space />
 
+
         <div class="q-gutter-sm row items-center no-wrap">
-          <!-- Nút mở tìm kiếm nâng cao -->
-          <q-btn color="white" round dense flat icon="search" @click="toggleSearchDrawer"></q-btn>
+
+
           <!-- Nút phóng full màn hình -->
           <q-btn color="white" round dense flat icon="fullscreen" @click="$q.fullscreen.toggle()"></q-btn>
           <!-- Thông Báo -->
@@ -35,8 +38,16 @@
               <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
             </q-avatar>
           </q-btn>
+          <q-toolbar>
+            <q-btn flat dense round @click="logout">
+              <q-icon name="logout" />
+              <q-tooltip>Logout</q-tooltip>
+            </q-btn>
+          </q-toolbar>
         </div>
+
       </q-toolbar>
+
     </q-header>
 
     <!-- Quản li -->
@@ -49,23 +60,24 @@
           <q-list class="q-pl-sm">
 
             <!-- Hồ Sơ -->
-            <q-item dense to="/CatalogPages/list" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/CatalogPages" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Hồ Sơ</q-item-label>
               </q-item-section>
             </q-item>
-
-            <!-- Hồ Sơ -->
-            <q-item dense to="/CatalogPages/approve" active-class="q-item-no-link-highlighting">
+            <!-- PHÔNG -->
+            <q-item dense to="/CatalogStorage" active-class="q-item-no-link-highlighting">
               <q-item-section>
-                <q-item-label>Hồ Sơ</q-item-label>
+                <q-item-label>Phông</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
         </q-expansion-item>
 
-          <!-- Quản lí Kho -->
-          <q-expansion-item group="somegroup" class="q-item-expand" icon="collections" v-model="expanded"
+
+
+        <!-- Quản lí Kho -->
+        <q-expansion-item group="somegroup" class="q-item-expand" icon="inventory_2" v-model="expanded"
           label="QUẢN LÍ KHO" header-class="bg-secondary text-white" active-class="q-expansion-item-hightlighting">
           <q-list class="q-pl-sm">
 
@@ -81,25 +93,25 @@
               </q-item-section>
             </q-item>
 
-            <q-item dense to="/WarehousePages" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/FloorPages" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Phòng</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item dense to="/WarehousePages" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/ShelfPages" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Kệ</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item dense to="/WarehousePages" active-class="q-item-no-link-highlighting">
+            <q-item dense to="PricePages" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Giá</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item dense to="/WarehousePages" active-class="q-item-no-link-highlighting">
+            <q-item dense to="FloorofpricePages" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Tầng Của Giá</q-item-label>
               </q-item-section>
@@ -111,7 +123,7 @@
         <q-expansion-item group="somegroup" icon="edit_note" header-class="bg-secondary text-white"
           label="QUẢN LÍ NGƯỜI DÙNG">
           <q-list class="q-pl-sm">
-            <q-item dense to="/StreetView" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/UserListPages" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Văn Bản</q-item-label>
               </q-item-section>
@@ -122,9 +134,23 @@
         <q-expansion-item group="somegroup" icon="inventory_2" label="QUẢN LÍ PHÂN QUYỀN"
           header-class="bg-secondary text-white">
           <q-list class="q-pl-sm">
-            <q-item dense :to="{ name: 'Warehouse.search' }" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/AccessPages" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Phân Quyền</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-expansion-item>
+
+        <!-- Quản Lí Tài Liệu -->
+        <q-expansion-item group="somegroup" class="q-item-expand" icon="collections" label="QUẢN LÍ TÀI LIỆU"
+          header-class="bg-secondary text-white" active-class="q-expansion-item-hightlighting">
+          <q-list class="q-pl-sm">
+
+            <!-- TÀI LIỆU -->
+            <q-item dense to="/DocumentPages" active-class="q-item-no-link-highlighting">
+              <q-item-section>
+                <q-item-label>Tài Liệu</q-item-label>
               </q-item-section>
             </q-item>
           </q-list>
@@ -133,7 +159,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view></router-view>
+      <router-view>
+
+      </router-view>
     </q-page-container>
   </q-layout>
 </template>
@@ -155,21 +183,17 @@ const crumbs = computed(() => route.meta.breadcrumbs || []);
 const isSearchDialogOpen = ref(false);
 const searchQuery = ref("");
 
-// Phương thức để mở/đóng dialog tìm kiếm nâng cao
-function toggleSearch() {
-  isSearchDialogOpen.value = !isSearchDialogOpen.value;
-}
-// Phương thức thực hiện tìm kiếm
-function performSearch() {
-  console.log("Searching for:", searchQuery.value);
-  toggleSearch(); // Đóng dialog sau khi thực hiện tìm kiếm
-}
+
 
 // Phương thức fullscreen
 function toggleFullscreen() {
   $q.fullscreen.toggle();
 }
-
+// Phương thức logout
+function logout() {
+  // Handle logout logic here, e.g., clearing auth tokens
+  router.push('/login');
+}
 watch(route, () => {
   console.log("Route changed:", route.fullPath);
 });

@@ -1,374 +1,443 @@
 <template>
-  <div class="q-gutter-md">
-    <div class="row q-pa-sm">
-      <q-btn
-        label="Chọn hồ sơ"
-        @click="onDrawerSelectBriefCase"
-        icon="fact_check"
-        class="q-ml-sm text-capitalize"
-        color="green"
-        :dense="$q.screen.lt.md"
-        :size="$q.screen.lt.sm ? 'sm' : 'md'"
-      />
-    </div>
-    <Warehouse-Select-Sort @submit="onSubmit"></Warehouse-Select-Sort>
-    <q-card>
-      <brief-case-table
-        :viewCreate="false"
-        :viewExport="false"
-        title="Danh sách hồ sơ đã chọn"
-        processType="warehouse_selected"
-        :datas="briefCaseDatas"
-        @infoData="infoData($event)"
-      ></brief-case-table>
-    </q-card>
-    <q-drawer
-      v-model="drawerSelectBriefCase"
-      bordered
-      :width="autoDrawerWidth"
-      side="right"
-      behavior="mobile"
-      overlay
-      no-swipe-close
-      no-swipe-open
-      no-swipe-backdrop
-    >
-      <brief-case-table
-        ref="BriefTableSelect"
-        :viewCreate="false"
-        :viewExport="false"
-        @selectChange="selectedBriedCaseExpireChange"
-        processType="warehouse_sort"
-        :datas="briefCaseExpireDatas"
-        @infoData="infoData($event)"
-      ></brief-case-table>
-      <q-card-actions align="center">
-        <q-btn
-          label="Chọn hồ sơ"
-          @click="selectBriefCaseClick"
-          icon="fact_check"
-          class="q-ml-sm text-capitalize"
-          color="green"
-          :dense="$q.screen.lt.md"
-          :size="$q.screen.lt.sm ? 'sm' : 'md'"
-        />
-        <q-btn
-          v-if="!$q.screen.lt.md"
-          icon="cancel"
-          :dense="$q.screen.lt.md"
-          :size="$q.screen.lt.sm ? 'sm' : 'md'"
-          label="Đóng"
-          color="red"
-          @click="drawerSelectBriefCase = !drawerSelectBriefCase"
-        />
-      </q-card-actions>
-      <q-separator />
-    </q-drawer>
-  </div>
+  <q-layout>
+    <q-page-container>
+      <q-page class="q-pa-md" style="background-color: aliceblue;">
+        <div
+          class="q-table__container q-table--cell-separator column no-wrap q-table__card q-table--bordered q-table--dense q-table--no-wrap q-pa-sm">
+          <div class="header ">
+            <div class="title">DANH SÁCH TẦNG</div>
+            <div class="search">
+              <q-input round outlined v-model="searchQuery" placeholder="từ khóa tìm kiếm....">
+                <template v-slot:append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+              <div class="record-count">{{ filteredRows.length }} bản ghi</div>
+            </div>
+          </div>
+          <q-table :rows="filteredRows" :table-header-style="{ color: 'red' }" :columns="columns" row-key="id"
+            selection="multiple" v-model:selected="selected" flat dense>
+            <template v-slot:body-cell-actions="props">
+              <q-td :props="props">
+                <q-btn flat icon="edit" @click="openEditModal(props.row)" />
+                <q-btn flat icon="share" @click="shareRow(props.row)" />
+                <q-btn flat icon="info" @click="showDetails(props.row)" />
+
+                <q-btn flat icon="delete" color="negative" @click="confirmDelete(props.row)" />
+              </q-td>
+            </template>
+            <template v-slot:body-cell-status="props">
+              <q-td :props="props">
+                <q-badge :color="props.row.status.color">
+                  {{ props.row.status }}
+                </q-badge>
+              </q-td>
+            </template>
+          </q-table>
+          <q-btn icon="add" label="Thêm Mới" color="secondary" @click="openAddModal" class="add-button " />
+        </div>
+      </q-page>
+    </q-page-container>
+
+    <!-- Add Modal -->
+    <q-dialog v-model="addModal" full-width position="top">
+
+      <q-card class="row">
+        <q-card-section>
+          <div class="text-h4" style="color: blue;">THÊM MỚI TẦNG</div>
+        </q-card-section>
+        <q-card-section>
+          <q-list class="row">
+
+            <!-- name -->
+            <q-item class="col-xl-3 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+              <q-item-section>
+                <q-select dense v-model="newRow.warehouse_form" label="TÒA_KHO NHÀ *" label-color="blue"
+                  @filter="filter_Ware" :options="list_Ware" lazy-rules behavior="menu" :rules="['Vui Lòng Chọn Kho']"
+                  use-input use-chips @new-value="addNewName"></q-select>
+
+              </q-item-section>
+            </q-item>
+
+
+
+            <!-- floor -->
+            <q-item class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+              <q-item-section>
+                <q-select dense v-model="newRow.Floor_form" label="TẦNG *" label-color="blue" @filter="filter_Floor"
+                  :options="list_Floor" lazy-rules behavior="menu" :rules="['Vui Lòng Chọn Tầng']" use-input use-chips
+                  @new-value="addNewName"></q-select>
+              </q-item-section>
+            </q-item>
+
+            <!-- DATE -->
+            <q-item class="col-xl-3 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+              <q-item-section>
+                <q-input v-model="newRow.date" label="NGÀY TẠO" label-color="blue" lazy-rules :rules="[
+                  (val) => (val && val.length > 0) || 'Không được để trống',
+                ]"></q-input>
+              </q-item-section>
+            </q-item>
+          </q-list>
+
+
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Hủy" icon="cancel" push type="reset" color="deep-orange" class="q-ml-sm text-capitalize"
+            v-close-popup />
+          <q-btn flat label="Thêm" type="submit" push icon="save" class="text-capitalize" color="secondary"
+            @click="addNewRow" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Edit Modal -->
+    <q-dialog v-model="editModal" full-width position="top">
+      <q-card class="row">
+        <q-card-section>
+          <div class="text-h4" style="color: blue;">CHỈNH SỬA TẦNG</div>
+        </q-card-section>
+        <q-card-section>
+          <q-list class="row">
+            <!-- Tiêu đề hồ sơ -->
+            <q-item class="col-xl-3 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+              <q-item-section>
+                <q-select v-model="editedRow.warehouse_form" label="TÒA_KHO NHÀ" label-color="blue"
+                  @filter="filter_Ware" :options="list_Ware" lazy-rules :rules="['Không được để trống']" use-input
+                  use-chips @new-value="editNewName"></q-select>
+              </q-item-section>
+            </q-item>
+
+
+            <!-- Thông tin hồ sơ -->
+            <q-item class="col-xl-3 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+              <q-item-section>
+                <q-select v-model="editedRow.Floor_form" label="TẦNG" label-color="blue" @filter="filter_Floor"
+                  :options="list_Floor" lazy-rules :rules="['Không được để trống']" use-input use-chips
+                  @new-value="editNewName"></q-select>
+              </q-item-section>
+            </q-item>
+
+            <!-- Thông tin hồ sơ -->
+            <q-item class="col-xl-3 col-lg-5 col-md-12 col-sm-12 col-xs-12">
+              <q-item-section>
+                <q-input v-model="editedRow.date" label="NGÀY TẠO" />
+              </q-item-section>
+            </q-item>
+
+
+          </q-list>
+        </q-card-section>
+
+        <q-card-actions align="right" style="top: 10%;">
+          <q-btn flat label="Hủy" icon="cancel" push type="reset" color="deep-orange" class="q-ml-sm text-capitalize"
+            v-close-popup />
+          <q-btn flat label="Thêm" type="submit" push icon="save" class="text-capitalize" color="secondary"
+            @click="saveEdit" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <!-- Delete Confirmation Modal -->
+    <q-dialog v-model="deleteModal">
+      <q-card>
+        <q-card-section>
+          <div class="text-h6">Xác nhận xóa</div>
+        </q-card-section>
+        <q-card-section>
+          Bạn có chắc chắn muốn xóa hồ sơ này không?
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Hủy" color="negative" v-close-popup />
+          <q-btn flat label="Xóa" color="positive" @click="deleteRow" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <!-- Details Modal -->
+    <q-dialog v-model="detailsModal" full-width position="top">
+      <q-card>
+        <q-card-section>
+          <div class="text-h4" style="color: blue;">{{ detailsRow.warehouse_form }}</div>
+        </q-card-section>
+        <q-card-section style="font-size: larger;">
+
+          <q-item class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <q-item-section>
+              <div><strong>Tòa Nhà:</strong> {{ detailsRow.info }}</div>
+            </q-item-section>
+          </q-item>
+          <q-item class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <q-item-section>
+              <div><strong>Tầng:</strong> {{ detailsRow.address }}</div>
+
+            </q-item-section>
+          </q-item>
+          <q-item class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+            <q-item-section>
+              <div><strong>Ngày Tạo:</strong> {{ detailsRow.date }}</div>
+
+            </q-item-section>
+          </q-item>
+
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Đóng" color="red" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+  </q-layout>
 </template>
 
 <script>
-import { date } from "quasar";
+import { ref } from 'vue'
+
 export default {
-  components: {
-    WarehouseSelectSort: () =>
-      import("components/WareHouse/WarehouseSelectSoft.vue"),
-    BriefCaseTable: () => import("components/BriefCase/BriefCaseTable.vue"),
-  },
-  props: {
-    value: {},
-    viewEdit: {
-      default: true,
-      type: Boolean,
-    },
-    viewApprove: {
-      default: true,
-      type: Boolean,
-    },
-    viewSendApprove: {
-      default: true,
-      type: Boolean,
-    },
-    viewReject: {
-      default: true,
-      type: Boolean,
-    },
-    processType: {
-      default: "",
-      type: String,
-    },
-  },
+
   data() {
     return {
-      selectedBriedCaseExpire: [],
-      drawerSelectBriefCase: false,
-      titleApprove: "",
-      contentApprove: "",
-      confirmSendApprove: false,
-      confirmReject: false,
-      title: "Chi tiết quyết định",
-      accept: false,
-      Destroy_Info: "",
-      briefCase_Info: "",
-      viewCreateBriefCase: false,
-      viewExportBriefCase: false,
-      briefCaseDatas: [],
-      briefCaseExpireDatas: [
-        {
-          BriefCaseId: "1",
-          Title: "Kế hoạch 3 tháng đầu năm 2020",
-          FileNotation: "hồ sơ 001",
-          StartDate: "2020-01-01",
-          EndDate: "2020-03-31",
-          Maintenance: { label: "10 năm", value: 2 },
-          NumPage: "10",
-          NumImage: "20",
-          DepositoryName: "Phòng kế hoạch tổng hợp",
-          Classify: "Số hóa",
-          Status: {
-            Name: "Hết hạn",
-            Color: "green",
-          },
-          Description: "",
-          Organization: {
-            label: "Sở kế hoạch và đầu tư tỉnh Quảng Nam",
-            Identifier: "000.010.G93",
-            value: 1,
-          },
-        },
-        {
-          BriefCaseId: "2",
-          Title: "Kế hoạch quý 2 năm 2020",
-          FileNotation: "hồ sơ 002",
-          StartDate: "2020-04-01",
-          EndDate: "2020-06-30",
-          Maintenance: { label: "10 năm", value: 2 },
-          NumPage: "10",
-          NumImage: "20",
-          DepositoryName: "Phòng kế hoạch tổng hợp",
-          Classify: "Số hóa",
-          Status: {
-            Name: "Hết hạn",
-            Color: "green",
-          },
-          Description: "",
-          Organization: {
-            label: "Sở kế hoạch và đầu tư tỉnh Quảng Nam",
-            Identifier: "000.010.G93",
-            value: 1,
-          },
-        },
-        {
-          BriefCaseId: "3",
-          Title: "Kế hoạch quý 3 năm 2020",
-          FileNotation: "hồ sơ 003",
-          StartDate: "2020-07-01",
-          EndDate: "2020-9-30",
-          Maintenance: { label: "10 năm", value: 2 },
-          NumPage: "10",
-          NumImage: "20",
-          DepositoryName: "Phòng kế hoạch tổng hợp",
-          Classify: "Số hóa",
-          Status: {
-            Name: "Hết hạn",
-            Color: "green",
-          },
-          Description: "",
-          Organization: {
-            label: "Sở kế hoạch và đầu tư tỉnh Quảng Nam",
-            Identifier: "000.010.G93",
-            value: 1,
-          },
-        },
-        {
-          BriefCaseId: "4",
-          Title: "Kế hoạch 3 tháng cuối năm 2020",
-          FileNotation: "hồ sơ 004",
-          StartDate: "2020-10-01",
-          EndDate: "2020-12-30",
-          Maintenance: { label: "10 năm", value: 2 },
-          NumPage: "10",
-          NumImage: "20",
-          DepositoryName: "Phòng kế hoạch tổng hợp",
-          Classify: "Số hóa",
-          Status: {
-            Name: "Hết hạn",
-            Color: "green",
-          },
-          Description: "",
-          Organization: {
-            label: "Sở kế hoạch và đầu tư tỉnh Quảng Nam",
-            Identifier: "000.010.G93",
-            value: 1,
-          },
-        },
+      searchQuery: '',
+      addModal: false,
+      editModal: false,
+      deleteModal: false,
+      detailsModal: 'false',
+      warehouse_form: '',
+
+      selected: ref([]),
+
+      newRow: {
+        id: null,
+        warehouse_form: "",
+        Floor_form: '',
+        date: "",
+      },
+
+      editedRow: {
+        warehouse_form: "",
+        Floor_form: '',
+        date: "",
+      },
+      detailsRow: {
+        warehouse_form: "",
+        Floor_form: '',
+        date: "",
+      },
+      list_Floor: ["Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4", "Tầng 5",],
+
+      list_Ware: [
+        "Khu Vực 1", "Khu Vực 2", "Khu Vực 3", "Khu Vực 4", "Khu Vực 5",
       ],
-    };
-  },
-  created() {
-    this.Destroy_Info = this.value;
-  },
-  mounted() {
-    if (this.processType) {
-      switch (this.processType) {
-        case "collect":
-          this.props.viewEdit = false;
-          this.props.viewApprove = false;
-          this.props.viewSendApprove = false;
-          this.props.viewReject = false;
-          this.props.viewCreateBriefCase = false;
-          this.props.viewExportBriefCase = true;
-          break;
-        case "info":
-          this.props.props.viewEdit = true;
-          this.props.viewSendApprove = true;
-          this.props.viewReject = false;
-          this.props.viewApprove = false;
-          this.props.viewCreateBriefCase = true;
-          this.props.viewExportBriefCase = true;
-        case "approve":
-          this.props.viewEdit = false;
-          this.props.viewSendApprove = false;
-          this.props.viewReject = true;
-          this.props.viewApprove = true;
-          this.props.viewCreateBriefCase = false;
-          this.props.viewExportBriefCase = false;
-      }
+      columns: [
+        {
+          name: 'stt',
+
+          label: 'STT',
+          align: 'center',
+          field: 'stt'
+
+        },
+
+        { name: "warehouse_form", label: 'TÒA_KHO NHÀ', align: 'center', field: "warehouse_form" },
+        { name: "Floor_form", label: 'TẦNG', align: 'center', field: "Floor_form" },
+        { name: 'date', label: 'NGÀY TẠO', align: 'center', field: 'date' },
+        { name: 'status', label: 'TRẠNG THÁI', align: 'center', field: 'status' },
+        { name: 'actions', label: 'THAO TÁC', align: 'center', field: 'actions' }
+      ],
+      rows: [
+        {
+          id: 1,
+          stt: 1,
+          warehouse_form: 'Khu Vực 01',
+          Floor_form: 'Tầng 01',
+          date: '19/12/2022',
+          status: 'Mới',
+          actions: ''
+        },
+        {
+          id: 2,
+          stt: 2,
+          warehouse_form: 'Khu Vực 01',
+          Floor_form: 'Tầng 02',
+          date: '19/12/2022',
+          status: 'Mới',
+          actions: ''
+        },
+        {
+          id: 3,
+          stt: 3,
+          warehouse_form: 'Khu Vực 01',
+          Floor_form: 'Tầng 03',
+          date: '19/12/2022',
+          status: 'Mới',
+          actions: ''
+        },
+        {
+          id: 4,
+          stt: 4,
+          warehouse_form: 'Khu Vực 01',
+          Floor_form: 'Tầng 04',
+          date: '19/12/2022',
+          status: 'Mới',
+          actions: ''
+        },
+        {
+          id: 5,
+          stt: 5,
+          warehouse_form: 'Khu Vực 01',
+          Floor_form: 'Tầng 05',
+          date: '19/12/2022',
+          status: 'Mới',
+          actions: ''
+        },
+
+      ]
     }
   },
   computed: {
-    autoDrawerWidth: function () {
-      if ("$q.screen.lt.lg") {
-        return 1000;
+    filteredRows() {
+      if (!this.searchQuery) {
+        return this.rows;
       }
-      return 700;
-    },
-    displayApprove: function () {
-      if (!this.viewApprove) return false;
-      if (this.Destroy_Info.isApproved) {
-        return false;
-      }
-      return true;
-    },
-    displaySubmit: function () {
-      if (!this.viewSendApprove) return false;
-      if (this.Destroy_Info.IsSubmited) {
-        return false;
-      }
-      return true;
-    },
-    displayEdit: function () {
-      if (!this.viewEdit) return false;
-      if (this.Destroy_Info.IsSubmited || this.Destroy_Info.IsApproved) {
-        return false;
-      }
-      return true;
-    },
-    displayReject: function () {
-      if (!this.viewReject) return false;
-      if (this.Destroy_Info.IsApproved) {
-        return false;
-      }
-      return true;
+      const query = this.searchQuery.toLowerCase();
+      return this.rows.filter(
+        (row) =>
+          row.warehouse_form.toLowerCase().includes(query) ||
+          row.Floor_form.toLowerCase().includes(query) ||
+          row.address.toLowerCase().includes(query) ||
+          row.date.toLowerCase().includes(query) ||
+          row.status.toLowerCase().includes(query)
+      );
     },
   },
+
   methods: {
-    onDrawerSelectBriefCase() {
-      debugger;
-      this.drawerSelectBriefCase = !this.drawerSelectBriefCase;
-      this.$refs.BriefTableSelect.clearSelection();
+    openAddModal() {
+      this.newRow = {
+        id: null,
+        warehouse_form: "",
+        Floor_form: "",
+        date: "",
+        status: "Mới",
+      };
+      this.addModal = true;
     },
-    onSubmit(data) {
-      if (this.briefCaseDatas.length == 0) {
-        this.$q.notify({
-          type: "negative",
-          position: "center",
-          message: "Vui lòng chọn danh sách hồ sơ",
-        });
-        return;
+    addNewRow() {
+      if (this.newRow.warehouse_form && this.newRow.Floor_form && this.newRow.date) {
+        this.newRow.id = this.rows.length + 1;
+        this.newRow.stt = this.rows.length + 1;
+        this.rows.push({ ...this.newRow });
+        this.addModal = false;
       }
-      this.$q.notify({
-        type: "positive",
-        position: "center",
-        message: "Gắn kho lưu trữ hồ sơ thành công",
-      });
-      this.selectedBriedCaseExpire = [];
-      this.briefCaseDatas = [];
     },
-    selectedBriedCaseExpireChange(val) {
-      this.selectedBriedCaseExpire = val;
+    openEditModal(row) {
+      this.editedRow = { ...row };
+      this.editModal = true;
     },
-    selectBriefCaseClick() {
-      debugger;
-      this.briefCaseDatas = [
-        ...this.selectedBriedCaseExpire,
-        ...this.briefCaseDatas,
-      ];
-      this.drawerSelectBriefCase = false;
-      this.selectedBriedCaseExpire.forEach((item, index) => {
-        var bcIndex = this.briefCaseExpireDatas.indexOf(item);
-        this.briefCaseExpireDatas.splice(bcIndex, 1);
-      });
+
+    showDetails(row) {
+      this.detailsRow = { ...row }
+      this.detailsModal = true
     },
-    formattedDate(dateString) {
+    saveEdit() {
+      const index = this.rows.findIndex(row => row.id === this.editedRow.id);
+      if (index !== -1) {
+        this.rows.splice(index, 1, this.editedRow);
+        this.editModal = false;
+      }
+    },
+    shareRow(row) {
+      const shareData = {
+        title: row.warehouse_form,
+        text: row.Floor_form,
+        url: window.location.href
+      };
       try {
-        return date.formatDate(dateString, "DD/MM/YYYY");
-      } catch {}
-      return "";
-    },
-    openFormSendApproveClick() {
-      this.titleApprove = "Gửi duyệt quyết định tiêu hủy?";
-      this.contentApprove = "Bạn muốn gửi duyệt quyết định: ";
-      this.confirmSendApprove = true;
-    },
-    openFormApproveClick() {
-      this.titleApprove = "Duyệt quyết định tiêu hủy?";
-      this.contentApprove = "Bạn muốn duyệt quyết định tiêu hủy: ";
-      this.confirmSendApprove = true;
-    },
-    sendApproveClick() {
-      if (this.viewSendApprove) {
-        this.confirmSendApprove = false;
-        this.sendApprove();
-        this.$q.notify({
-          type: "positive",
-          position: "center",
-          timeout: 1000,
-          message: "Gửi duyệt thành công",
+        navigator.share(shareData).then(() => {
+          console.log('Shared successfully');
         });
-      } else if (this.viewApprove) {
-        this.confirmSendApprove = false;
-        this.approve();
-        this.$q.notify({
-          type: "positive",
-          position: "center",
-          timeout: 1000,
-          message: "Duyệt thành công",
-        });
+      } catch (err) {
+        console.error('Error sharing:', err);
       }
     },
-    approve() {
-      this.$emit("approve", { ...this.value });
+
+    confirmDelete(row) {
+      this.rowToDelete = row;
+      this.deleteModal = true;
     },
-    sendApprove() {
-      this.$emit("submit", { ...this.value });
+    deleteRow() {
+      const index = this.rows.findIndex(row => row.id === this.rowToDelete.id);
+      if (index !== -1) {
+        this.rows.splice(index, 1);
+      }
+      this.deleteModal = false;
     },
-    backClick() {
-      this.$emit("backClick");
+    filter_Ware(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.list_Ware = ["Khu Vực 1", "Khu Vực 2", "Khu Vực 3", "Khu Vực 4", "Khu Vực 5"].filter(
+          v => v.toLowerCase().indexOf(needle) > -1
+        );
+      });
     },
-    editClick(value) {
-      this.$emit("editData", { ...value });
-    },
-    TableAddOrUpdate: function (data) {
-      value = data;
-    },
-    UpdateInfo(value) {
-      value = value;
-    },
-    infoData(data) {
-      this.briefCase_Info = data;
-      this.$emit("infoData", data);
-    },
-  },
-};
+    filter_Floor(val, update, abort) {
+      update(() => {
+        const needle = val.toLowerCase();
+        this.list_Floor = ["Tầng 1", "Tầng 2", "Tầng 3", "Tầng 4", "Tầng 5"].filter(
+          v => v.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    }
+
+  }
+}
 </script>
+
+<style scoped>
+.q-layout {
+  height: 100vh;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+}
+
+.search .q-input {
+  margin-right: 1em;
+}
+
+.record-count {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.document-list {
+  background: white;
+  padding: 1em;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+
+.add-button {
+  position: fixed;
+  bottom: 1em;
+  right: 1em;
+}
+
+.title {
+  font-size: 30px;
+}
+</style>

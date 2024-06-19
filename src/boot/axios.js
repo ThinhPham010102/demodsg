@@ -1,24 +1,69 @@
-import { boot } from 'quasar/wrappers'
-import axios from 'axios'
+import Vue from "vue";
+import Vuex from "vuex";
+import axios from "axios";
 
-// Be careful when using SSR for cross-request state pollution
-// due to creating a Singleton instance here;
-// If any client changes this (global) instance, it might be a
-// good idea to move this instance creation inside of the
-// "export default () => {}" function below (which runs individually
-// for each client)
-const api = axios.create({ baseURL: 'https://api.example.com' })
+Vue.use(Vuex);
 
-export default boot(({ app }) => {
-  // for use inside Vue files (Options API) through this.$axios and this.$api
-
-  app.config.globalProperties.$axios = axios
-  // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
-  //       so you won't necessarily have to import axios in each vue file
-
-  app.config.globalProperties.$api = api
-  // ^ ^ ^ this will allow you to use this.$api (for Vue Options API form)
-  //       so you can easily perform requests against your app's API
-})
-
-export { api }
+export default new Vuex.Store({
+  state: {
+    token: localStorage.getItem("token") || "",
+    user: {},
+    status: "",
+  },
+  mutations: {
+    auth_request(state) {
+      state.status = "loading";
+    },
+    auth_success(state, { token, user }) {
+      state.status = "success";
+      state.token = token;
+      state.user = user;
+    },
+    auth_error(state) {
+      state.status = "error";
+    },
+    logout(state) {
+      state.status = "";
+      state.token = "";
+      state.user = {};
+    },
+  },
+  actions: {
+    login({ commit }, user) {
+      return new Promise((resolve, reject) => {
+        commit("auth_request");
+        axios({
+          url: "http://192.168.1.254:9001",
+          data: user,
+          method: "POST",
+        })
+          .then((response) => {
+            const token = response.data.token;
+            const user = response.data.user;
+            localStorage.setItem("token", token);
+            axios.defaults.headers.common["Authorization"] = token;
+            commit("auth_success", { token, user });
+            resolve(response);
+          })
+          .catch((err) => {
+            commit("auth_error");
+            localStorage.removeItem("token");
+            reject(err);
+          });
+      });
+    },
+    logout({ commit }) {
+      return new Promise((resolve) => {
+        commit("logout");
+        localStorage.removeItem("token");
+        delete axios.defaults.headers.common["Authorization"];
+        resolve();
+      });
+    },
+  },
+  getters: {
+    isAuthenticated: (state) => !!state.token,
+    authStatus: (state) => state.status,
+    user: (state) => state.user,
+  },
+});
