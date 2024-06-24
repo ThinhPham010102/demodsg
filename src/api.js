@@ -1,6 +1,6 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://your-iis-server/api'; // Replace with your IIS server API URL
+const API_URL = "http://your-iis-server/api"; // Replace with your IIS server API URL
 
 export default {
   getItems() {
@@ -17,5 +17,5 @@ export default {
   },
   deleteItem(id) {
     return axios.delete(`${API_URL}/items/${id}`);
-  }
+  },
 };
