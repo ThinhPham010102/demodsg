@@ -5,34 +5,55 @@
         <q-card class="q-pa-md q-my-lg q-my-xl q-my-xxl responsive-card">
           <q-card-section>
             <q-avatar size="120px" class="absolute-center shadow-20">
-              <img src="/src/assets/LOGO.svg" alt="Logo"> <!-- Corrected path to the logo -->
+              <img src="/src/assets/LOGO.svg" alt="Logo" />
+              <!-- Corrected path to the logo -->
             </q-avatar>
           </q-card-section>
           <q-card-section>
             <div class="text-center q-pt-lg">
-              <div class="col text-h5 ellipsis text-bold text" style="color: green; margin-top: 30px;">
+              <div
+                class="col text-h5 ellipsis text-bold text"
+                style="color: green; margin-top: 30px"
+              >
                 Welcome Back!
               </div>
-              <div class="col text-subtitle2 text" style="color: green;">
+              <div class="col text-subtitle2 text" style="color: green">
                 Please log in to your account
               </div>
             </div>
           </q-card-section>
           <q-card-section>
             <q-form class="q-gutter-md" @submit.prevent="handleSubmit">
-              <q-input filled v-model="enteredUsername" label="Username" label-color="green-10" lazy-rules>
+              <q-input
+                filled
+                v-model="enteredUsername"
+                label="Username"
+                label-color="green-10"
+                lazy-rules
+              >
                 <template v-slot:append>
                   <q-icon name="person" />
                 </template>
               </q-input>
-              <q-input type="password" filled v-model="enteredPassword" label="Password" label-color="green-10"
-                lazy-rules>
+              <q-input
+                type="password"
+                filled
+                v-model="enteredPassword"
+                label="Password"
+                label-color="green-10"
+                lazy-rules
+              >
                 <template v-slot:append>
                   <q-icon name="lock" />
                 </template>
               </q-input>
               <div class="text-center q-pt-md">
-                <q-btn label="Login" type="submit" color="green-10" class="full-width" />
+                <q-btn
+                  label="Login"
+                  type="submit"
+                  color="green-10"
+                  class="full-width"
+                />
               </div>
             </q-form>
           </q-card-section>
@@ -43,56 +64,53 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
+import authService from "../services/authService";
 
 export default {
   data() {
     return {
-      enteredUsername: '',
-      enteredPassword: ''
+      enteredUsername: "",
+      enteredPassword: "",
     };
   },
   methods: {
     async handleSubmit() {
       try {
         const params = new URLSearchParams();
-        params.append('grant_type', 'password');
-        params.append('client_id', 'ro.client');
-        params.append('client_secret', 'secret');
-        params.append('scope', 'read_access full_access');
-        params.append('username', this.enteredUsername); // 'UserName' to 'username' for consistency
-        params.append('password', this.enteredPassword); // 'Password' to 'password' for consistency
-
-        const response = await axios.post('https://sohodms-ids.azurewebsites.net/connect/token', params, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        });
-
+        params.append("grant_type", "password");
+        params.append("client_id", "ro.client");
+        params.append("client_secret", "secret");
+        params.append("scope", "read_access full_access offline_access");
+        params.append("username", this.enteredUsername); // 'UserName' to 'username' for consistency
+        params.append("password", this.enteredPassword); // 'Password' to 'password' for consistency
+        const response = await authService.login(params);
         console.log(response.data);
         // Handle the access token here, for example, store it in localStorage or state management
-        localStorage.setItem('access_token', response.data.access_token);
-
+        authService.setTokens(
+          response.data.access_token,
+          response.data.refresh_token
+        );
         // Navigate to the home page upon successful login
-        this.$router.push('/');
+        this.$router.push("/");
       } catch (error) {
-        console.error('Error during login:', error);
+        console.error("Error during login:", error);
         // Show an error message
         this.$q.notify({
-          color: 'negative',
-          position: 'top',
-          message: 'Invalid username or password',
-          icon: 'warning'
+          color: "negative",
+          position: "top",
+          message: "Invalid username or password",
+          icon: "warning",
         });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style>
 .bg-image {
-  background-image: linear-gradient(135deg, #FFE67C 0%, #FFE67C 100%);
+  background-image: linear-gradient(135deg, #ffe67c 0%, #ffe67c 100%);
   background-size: cover;
   background-position: center;
   height: 100vh;
@@ -104,11 +122,11 @@ export default {
 }
 
 .text-primary {
-  color: #295F2D;
+  color: #295f2d;
 }
 
 .text-secondary {
-  color: #295F2D;
+  color: #295f2d;
 }
 
 .full-width {

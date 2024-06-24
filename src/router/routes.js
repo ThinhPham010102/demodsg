@@ -2,30 +2,38 @@ const routes = [
   {
     path: "/",
     component: () => import("layouts/MainLayout.vue"),
+    meta: {
+      requireAuth: true,
+    },
     children: [
       { path: "/", component: () => import("pages/IndexPage.vue") },
       {
         path: "home",
         component: () => import("pages/HomePage.vue"),
         name: "Home",
+        meta: { requiresAuth: true },
       },
       {
         path: "/StorageFloor",
         component: () => import("pages/StorageFloor.vue"),
         name: "StorageFloor",
+        meta: { requiresAuth: true },
       },
       {
         path: "/CatalogPages",
         component: () => import("pages/CatalogPages.vue"),
+        meta: { requiresAuth: true },
       },
       {
         path: "/CatalogStorage",
         component: () => import("pages/CatalogStorage.vue"),
+        meta: { requiresAuth: true },
       },
       {
         path: "/FloorofpricePages",
         component: () => import("pages/FloorofpricePages.vue"),
         name: "FloorofpricePages",
+        meta: { requiresAuth: true },
       },
       {
         path: "/DocumentPages",

@@ -24,6 +24,7 @@ import UserListPages from "pages/UserListPages.vue";
 import StorageWarehouse from "pages/StorageWarehouse.vue";
 import LoginPage from "pages/LoginPage.vue";
 import ErrorNotFound from "pages/ErrorNotFound.vue";
+import authService from "../services/authService";
 export default route(function ({ store }) {
   // Pass store if needed
 
@@ -41,14 +42,16 @@ export default route(function ({ store }) {
 
   // Middleware to check authentication
   Router.beforeEach((to, from, next) => {
+    console.log("Router authen is running");
     if (to.matched.some((record) => record.meta.requiresAuth)) {
-      if (store.getters.isAuthenticated) {
-        // Make sure store is passed in the route function
+      console.log("Path is guard");
+      if (authService.isAuthenticated()) {
         next();
       } else {
         next("/login");
       }
     } else {
+      console.log("Path is not guard");
       next();
     }
   });
