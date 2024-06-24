@@ -176,7 +176,7 @@
                     <q-btn flat label="Thêm" type="submit" push icon="save" class="text-capitalize" color="secondary"
                         @click="saveEdit" />
                 </q-card-actions>
-            </q-card>
+            </q-card>2
         </q-dialog>
 
         <!-- Delete Confirmation Modal -->

@@ -301,7 +301,7 @@ export default {
                     Code_form: 'NhomNhaTrang',
                     Storage_form: 'Phông Lưu Trữ Công ty Nha Trang',
                     date: '4/4/2024',
-                    status: 'Active',
+                    status: 'null',
                     actions: ''
                 },
                 {

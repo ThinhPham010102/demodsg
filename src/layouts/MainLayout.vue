@@ -81,25 +81,25 @@
           label="QUẢN LÍ KHO" header-class="bg-secondary text-white" active-class="q-expansion-item-hightlighting">
           <q-list class="q-pl-sm">
 
-            <q-item dense to="/WarehousePages" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/StorageWarehouse" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Kho</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item dense to="/WarehouseSort" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/StorageFloor" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Tầng</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item dense to="/FloorPages" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/StorageRoom" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Phòng</q-item-label>
               </q-item-section>
             </q-item>
 
-            <q-item dense to="/ShelfPages" active-class="q-item-no-link-highlighting">
+            <q-item dense to="/StorageRowShelf" active-class="q-item-no-link-highlighting">
               <q-item-section>
                 <q-item-label>Kệ</q-item-label>
               </q-item-section>

@@ -5,7 +5,7 @@
         <q-card class="q-pa-md q-my-lg q-my-xl q-my-xxl responsive-card">
           <q-card-section>
             <q-avatar size="120px" class="absolute-center shadow-20">
-              <img src="/src/assets/dsg.svg" alt="Logo">
+              <img src="/src/assets/LOGO.svg" alt="Logo"> <!-- Corrected path to the logo -->
             </q-avatar>
           </q-card-section>
           <q-card-section>
@@ -43,21 +43,40 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
       enteredUsername: '',
       enteredPassword: ''
-    }
+    };
   },
   methods: {
-    handleSubmit() {
-      const validUsername = 'Admin';
-      const validPassword = '12345';
-      if (this.enteredUsername === validUsername && this.enteredPassword === validPassword) {
+    async handleSubmit() {
+      try {
+        const params = new URLSearchParams();
+        params.append('grant_type', 'password');
+        params.append('client_id', 'ro.client');
+        params.append('client_secret', 'secret');
+        params.append('scope', 'read_access full_access');
+        params.append('username', this.enteredUsername); // 'UserName' to 'username' for consistency
+        params.append('password', this.enteredPassword); // 'Password' to 'password' for consistency
+
+        const response = await axios.post('https://sohodms-ids.azurewebsites.net/connect/token', params, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        });
+
+        console.log(response.data);
+        // Handle the access token here, for example, store it in localStorage or state management
+        localStorage.setItem('access_token', response.data.access_token);
+
         // Navigate to the home page upon successful login
         this.$router.push('/');
-      } else {
+      } catch (error) {
+        console.error('Error during login:', error);
         // Show an error message
         this.$q.notify({
           color: 'negative',
@@ -68,7 +87,7 @@ export default {
       }
     }
   }
-}
+};
 </script>
 
 <style>

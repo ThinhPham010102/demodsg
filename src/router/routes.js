@@ -10,21 +10,9 @@ const routes = [
         name: "Home",
       },
       {
-        path: "/WarehouseSort",
-        component: () => import("pages/WarehouseSort.vue"),
-        name: "Warehouse.Sort",
-        meta: {
-          breadcrumb: [
-            {
-              text: "Kho lưu trữ",
-              to: { name: "Warehouse.Sort" },
-            },
-            {
-              text: "Sắp xếp hồ sơ",
-              to: { name: "Warehouse.Sort" },
-            },
-          ],
-        },
+        path: "/StorageFloor",
+        component: () => import("pages/StorageFloor.vue"),
+        name: "StorageFloor",
       },
       {
         path: "/CatalogPages",
@@ -45,9 +33,9 @@ const routes = [
         name: "DocumentPages",
       },
       {
-        path: "/ShelfPages",
-        component: () => import("pages/ShelfPages.vue"),
-        name: "ShelfPages",
+        path: "/StorageRowShelf",
+        component: () => import("pages/StorageRowShelf.vue"),
+        name: "StorageRowShelf",
       },
       {
         path: "/PricePages",
@@ -56,37 +44,20 @@ const routes = [
       },
 
       {
-        path: "/FloorPages",
-        component: () => import("pages/FloorPages.vue"),
-        name: "FloorPages",
+        path: "/StorageRoom",
+        component: () => import("pages/StorageRoom.vue"),
+        name: "StorageRoom",
       },
       {
         path: "/AccessPages",
         component: () => import("pages/AccessPages.vue"),
         name: "AccessPages",
       },
+
       {
-        path: "/UserListPages",
-        component: () => import("pages/UserListPages.vue"),
-        name: "UserListPages",
-      },
-      {
-        path: "/WarehousePages",
-        component: () => import("pages/WarehousePages.vue"),
-        name: "Warehouse.search",
-        meta: {
-          auth: true,
-          breadcrumb: [
-            {
-              text: "Kho lưu trữ",
-              to: { name: "Warehouse.search" },
-            },
-            {
-              text: "Tra cứu",
-              to: { name: "Warehouse.search" },
-            },
-          ],
-        },
+        path: "/StorageWarehouse",
+        component: () => import("pages/StorageWarehouse.vue"),
+        name: "Warehouse.StorageWarehouse",
       },
     ],
   },
@@ -96,16 +67,14 @@ const routes = [
     name: "Login",
     component: () => import("pages/LoginPage.vue"), // Lazy load
   },
-  {
-    path: "/dashboard",
-    name: "Dashboard",
-    component: () => import("pages/DashboardLogin.vue"), // Lazy load
-    meta: { requiresAuth: true },
-  },
 
   {
     path: "/:catchAll(.*)*",
     component: () => import("pages/ErrorNotFound.vue"),
+  },
+  {
+    path: "/Itemlist",
+    component: () => import("src/pages/ItemList.vue"),
   },
 ];
 

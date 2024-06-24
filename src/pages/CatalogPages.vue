@@ -41,6 +41,14 @@
         </q-card-section>
         <q-card-section>
           <q-list class="row">
+            <!-- Mã Hồ Sơ -->
+            <q-item class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
+              <q-item-section>
+                <q-input v-model="newRow.fileCode" label="Mã Hồ Sơ*" label-color="blue" lazy-rules :rules="[
+                  (val) => (val && val.length > 0) || 'Không được để trống',
+                ]"></q-input>
+              </q-item-section>
+            </q-item>
             <!-- Phông -->
             <q-item class="col-xl-3 col-lg-6 col-md-6 col-sm-12 col-xs-12">
               <q-item-section>

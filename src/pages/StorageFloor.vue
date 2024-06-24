@@ -39,7 +39,7 @@
       </q-page>
     </q-page-container>
 
-    <!-- Add Modal -->
+    <!--  addModal -->
     <q-dialog v-model="addModal" full-width position="top">
 
       <q-card class="row">
